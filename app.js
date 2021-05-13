@@ -7,13 +7,13 @@ const config = {
     gop_cache: true,
     ping: 30,
     ping_timeout: 60,
-	/*
+    /*
     ssl: {
       port: 443,
       key: './privatekey.pem',
       cert: './certificate.pem',
     }
-	*/
+    */
   },
   http: {
     port: 8000,
@@ -28,7 +28,7 @@ const config = {
     cert: './certificate.pem',
   },
   auth: {
-    api: true,
+    api: false,
     api_user: 'admin',
     api_pass: 'admin',
     play: false,
@@ -48,7 +48,11 @@ const config = {
         mp4Flags: '[movflags=frag_keyframe+empty_moov]',
       }
     ]
-  },  
+  },
+  relay: {
+    ffmpeg: '/usr/local/bin/ffmpeg',
+    tasks: []
+  }
 };
 
 

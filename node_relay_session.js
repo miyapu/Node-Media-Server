@@ -21,7 +21,7 @@ class NodeRelaySession extends EventEmitter {
 
   run() {
     let format = this.conf.ouPath.startsWith('rtsp://') ? 'rtsp' : 'flv';
-    let argv = ['-i', this.conf.inPath, '-c', 'copy', '-f', format, this.conf.ouPath];
+    let argv = ['-i', this.conf.inPath, '-c:v', 'copy', '-c:a', 'aac', '-f', format, this.conf.ouPath];
     if (this.conf.inPath[0] === '/' || this.conf.inPath[1] === ':') {
       argv.unshift('-1');
       argv.unshift('-stream_loop');
@@ -34,6 +34,10 @@ class NodeRelaySession extends EventEmitter {
         argv.unshift('-rtsp_transport');
       }
     }
+
+    //console.log("--------------------------------------------");
+    //console.log(argv);
+    //console.log("--------------------------------------------");
 
     Logger.ffdebug(argv.toString());
     this.ffmpeg_exec = spawn(this.conf.ffmpeg, argv);
