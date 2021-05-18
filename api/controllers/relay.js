@@ -37,8 +37,10 @@ function pullStream(req, res, next) {
   let url = req.body.url;
   let app = req.body.app;
   let name = req.body.name;
+  let src_ipaddr = req.body.src_ipaddr;
+  let src_portno = req.body.src_portno;
   if (url && app && name) {
-    this.nodeEvent.emit('relayPull', url, app, name);
+    this.nodeEvent.emit('relayPull', url, app, name, src_ipaddr, src_portno);
     res.sendStatus(200);
   } else {
     res.sendStatus(400);

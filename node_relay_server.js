@@ -74,24 +74,65 @@ class NodeRelayServer {
     }
   }
 
+  checkSession(url, conf) {
+    var isExist = false;
+    const keys = this.dynamicSessions.keys()
+    for (let key of keys) {
+      try {
+        var ses = this.dynamicSessions.get(key);
+        if (ses == null) {
+          continue;
+        }
+        // ソースURLが変化した場合, セッションを閉じる
+        if (ses.conf.inPath != url && ses.conf.ouPath == conf.ouPath) {
+          ses.end();
+          break;
+        }
+        // 同じパスの場合
+        else if (ses.conf.inPath == url && ses.conf.ouPath == conf.ouPath) {
+          isExist = true;
+          break;
+        }
+      } catch (err) {
+        Logger.error(`NodeRelaySession isExist check failed: ${err}`);
+      }
+    }
+    return isExist;
+  }
+
   //从远端拉推到本地
-  onRelayPull(url, app, name) {
+  onRelayPull(url, app, name, src_ipaddr, src_portno) {
     let conf = {};
     conf.app = app;
     conf.name = name;
+    conf.src_ipaddr = src_ipaddr;
+    conf.src_portno = src_portno;
     conf.ffmpeg = this.config.relay.ffmpeg;
     conf.inPath = url;
     conf.ouPath = `rtmp://127.0.0.1:${this.config.rtmp.port}/${app}/${name}`;
-    let session = new NodeRelaySession(conf);
-    const id = session.id;
-    context.sessions.set(id, session);
-    session.on('end', (id) => {
-      this.dynamicSessions.delete(id);
-    });
-    this.dynamicSessions.set(id, session);
-    session.run();
-    Logger.log('[Relay dynamic pull] start', id, conf.inPath, ' to ', conf.ouPath);
-    return id;
+
+    const isExist = this.checkSession(conf.inPath, conf);
+
+    if (isExist == false) {
+      let session = new NodeRelaySession(conf);
+      const id = session.id;
+      context.sessions.set(id, session);
+      session.on('end', (id) => {
+        try {
+          this.dynamicSessions.delete(id);
+        } catch (err) {
+          Logger.error(`NodeRelaySession end failed: ${err}`);
+        }
+      });
+
+      this.dynamicSessions.set(id, session);
+      session.run();
+      Logger.log('[Relay dynamic pull] start', id, conf.inPath, ' to ', conf.ouPath);
+      return id;
+    }
+    else {
+      return null;
+    }
   }
 
   //从本地拉推到远端
@@ -128,14 +169,18 @@ class NodeRelayServer {
         conf.ffmpeg = this.config.relay.ffmpeg;
         conf.inPath = hasApp ? `${conf.edge}/${stream}` : `${conf.edge}${streamPath}`;
         conf.ouPath = `rtmp://127.0.0.1:${this.config.rtmp.port}${streamPath}`;
-        let session = new NodeRelaySession(conf);
-        session.id = id;
-        session.on('end', (id) => {
-          this.dynamicSessions.delete(id);
-        });
-        this.dynamicSessions.set(id, session);
-        session.run();
-        Logger.log('[Relay dynamic pull] start', id, conf.inPath, ' to ', conf.ouPath);
+
+        const isExist = this.checkSession(conf.inPath, conf);
+        if (isExist == false) {
+          let session = new NodeRelaySession(conf);
+          session.id = id;
+          session.on('end', (id) => {
+            this.dynamicSessions.delete(id);
+          });
+          this.dynamicSessions.set(id, session);
+          session.run();
+          Logger.log('[Relay dynamic pull] start', id, conf.inPath, ' to ', conf.ouPath);
+        }
       }
     }
   }

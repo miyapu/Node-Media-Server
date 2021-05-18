@@ -35,6 +35,7 @@ const config = {
     publish: false,
     secret: 'nodemedia2017privatekey'
   },
+  /*
   trans: {
     ffmpeg: '/usr/local/bin/ffmpeg',
     tasks: [
@@ -49,6 +50,7 @@ const config = {
       }
     ]
   },
+  */
   relay: {
     ffmpeg: '/usr/local/bin/ffmpeg',
     tasks: []

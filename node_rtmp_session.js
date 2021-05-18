@@ -221,17 +221,17 @@ class NodeRtmpSession {
   }
 
   onSocketClose() {
-    // Logger.log('onSocketClose');
+    Logger.log('onSocketClose');
     this.stop();
   }
 
   onSocketError(e) {
-    // Logger.log('onSocketError', e);
+    Logger.log('onSocketError', e);
     this.stop();
   }
 
   onSocketTimeout() {
-    // Logger.log('onSocketTimeout');
+    Logger.log('onSocketTimeout');
     this.stop();
   }
 
@@ -733,6 +733,10 @@ class NodeRtmpSession {
     // Logger.log(rtmpChunks);
     for (let playerId of this.players) {
       let playerSession = context.sessions.get(playerId);
+
+      if (playerSession == undefined) {
+        continue;
+      }
 
       if (playerSession.numPlayCache === 0) {
         playerSession.res.cork();

@@ -4,7 +4,8 @@
   "description": "A Node.js implementation of RTMP Server",
   "main": "node_media_server.js",
   "scripts": {
-    "test": "node app.js"
+    "test": "node app.js",
+    "start": "set NODE_ENV=development&&node --expose_gc app.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,8 @@
     "express": "^4.16.4",
     "lodash": ">=4.17.13",
     "mkdirp": "1.0.3",
+    "rtsp-client": "^1.4.5",
+    "tcp-ping": "^0.1.1",
     "ws": "^5.2.2"
   },
   "engines": {
